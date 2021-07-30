@@ -34,7 +34,7 @@ CircOrf is a Python3-base pipeline for the prediction and visualization of circR
 # Quick Start
 Usually you can download the package from github simply,and then:
 ```
-tar -zxvf CircOrf.tar.gz
+git clone https://github.com/Lilab-SNNU/CircOrf.git
 cd CircOrf
 ```
 
