@@ -193,7 +193,7 @@ def bamtobed(bamfile,tmp_file_location):
 
 
 def main():
-    parse = argparse.ArgumentParser(description='This script helps to clean reads and map to genome')
+    parse = argparse.ArgumentParser(description='This script helps to filter coding reads')
     parse.add_argument('-y', dest="yaml", required=True)
     args = parse.parse_args()
 
