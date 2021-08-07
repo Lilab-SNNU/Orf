@@ -8,32 +8,9 @@ import time
 from PIL import Image, ImageDraw, ImageFont
 import math
 
-def file_load():
-     
-     parse = argparse.ArgumentParser(description='Welcome to this project')
-     parse.add_argument('-y', '--yaml', required=True, help='please input the yamlfile')
-     args = parse.parse_args()
-     
-     yamlfile = args.yaml
-     con_file = open(yamlfile)
-     fileload = yaml.full_load(con_file)
-     
-     lenth_need = fileload['lenth_need']
-     circrnas_file = fileload['result_file_location']+'/'+fileload['genome_name']+'.fa'
-     circrna_gtf = fileload['circrna_gtf']
-
-     # tmp file name and path
-     tmp_file_name = fileload['genome_name'] + '_orf'
-     tmp_file_path = fileload['tmp_file_location']
-
-     # final file name and path
-     final_name = fileload['genome_name'] + '_orf_filter_result'
-     final_file_path = fileload['result_file_location']
-
-     return lenth_need, circrnas_file, circrna_gtf, tmp_file_name, tmp_file_path, final_name, final_file_path    
 
 # Draw the each IRES secondary structure of coding potetial ORF
-def draw_IRES_secondary_structure(tmp_file_name, tmp_file_path, final_name, final_file_path):
+def draw_IRES_secondary_structure(IRES_folder, tmp_file_name, tmp_file_path, final_name, final_file_path):
 
     # make the final IRES file
     han_orf = open(final_file_path + '/' + final_name + '_virtual.fa','r+')
@@ -59,21 +36,11 @@ def draw_IRES_secondary_structure(tmp_file_name, tmp_file_path, final_name, fina
     han_final_ires.close()
 
 
-    IRES_graph_path = final_file_path + '/IRES_graph'
+    IRES_graph_path = final_file_path + '/' + IRES_folder
     IRES_file = tmp_file_path + '/' + tmp_file_name+'final_IRES_up.fa'
     
-    sh_script = '''
-    cd {}
-    mkdir IRES_graph
-    cd {}
-    RNAfold {}
-    '''.format(final_file_path, IRES_graph_path, IRES_file)
-
-    sh_file = tmp_file_path + '/' + tmp_file_name + '_shscript.sh'
-    han_sh_file = open(sh_file,'w+')
-    han_sh_file.write(sh_script)
-    han_sh_file.close()
-    os.system('sh {}'.format(sh_file))
+    os.system('cd {}'.format(IRES_graph_path))
+    os.system('RNAfold {}'.format(IRES_file))
     print(len(id_dic))
 
 # Make the samples index and the Matrix
@@ -134,7 +101,7 @@ def make_index(circrna_gtf, tmp_file_name, final_name, tmp_file_path, final_file
     df_matrix.to_csv(tmp_file_path+'/'+tmp_file_name+'_Matrix.csv', mode='w', index=False)
 
 # Draw the circ graph of each coding potential ORF
-def make_circ_pic(lenth_need, tmp_file_name, tmp_file_path, final_name, final_file_path):
+def make_circ_pic(CIRC_folder, lenth_need, tmp_file_name, tmp_file_path, final_name, final_file_path):
 
     def get_angle(bp, length):
         return bp * 360 / length
@@ -167,28 +134,13 @@ def make_circ_pic(lenth_need, tmp_file_name, tmp_file_path, final_name, final_fi
         DRAW.polygon((p1, p2, p3), fill=color)
         
 
-
-    sh_script = '''
-    cd {}
-    mkdir CIRC_graph
-    '''.format(final_file_path)
-    sh_file = tmp_file_path + '/' + tmp_file_name + '_png_shscript.sh'
-    han_sh_file = open(sh_file,'w+')
-    han_sh_file.write(sh_script)
-    han_sh_file.close()
-    os.system('sh {}'.format(sh_file))
-
-
-
     han_orf = open(final_file_path + '/' + final_name + '_virtual.fa','r+')
 
-    
+
     not_in_gtf_list = []
     for seq_record in SeqIO.parse(han_orf, 'fasta'):
-        
-             
-         
-        site = seq_record.id.split('|')[4]
+                   
+        site = seq_record.id.split('|')[-4]
         site = site.replace('start', '')
         site = site.replace('stop', '')
         site_list = site.split('-')
@@ -205,8 +157,8 @@ def make_circ_pic(lenth_need, tmp_file_name, tmp_file_path, final_name, final_fi
         orf_lenth = len(seq_record.seq)
         orf_start_site = eval(site_list[0])
         orf_stop_site = eval(site_list[1])
-        ires_score = seq_record.id.split('|')[6]
-        orf_score = seq_record.id.split('|')[7]
+        ires_score = seq_record.id.split('|')[-2]
+        orf_score = seq_record.id.split('|')[-1]
         transcript_id = seq_record.id.split('|')[2]
 
         if strand == '+':
@@ -292,7 +244,7 @@ def make_circ_pic(lenth_need, tmp_file_name, tmp_file_path, final_name, final_fi
         DRAW.text((2600,1800), "5'", fill='black', font = arial150)
 
         new_name = circ_name + '|' + seq_record.id.split('|')[4]
-        myseq.save(final_file_path + '/CIRC_graph/{}.png'.format(new_name))
+        myseq.save(final_file_path + '/{}/{}.png'.format(CIRC_folder, new_name))
 
     han_not = open(tmp_file_path + '/' + tmp_file_name + '_not_in_gtf_list','w+')
     han_not.writelines(not_in_gtf_list)
@@ -323,34 +275,158 @@ def UpsetR(final_name, tmp_file_name, tmp_file_path, final_file_path):
     han_r_file.close()
     os.system('Rscript {}'.format(r_file))
 
+# draw the express_analysis pdf
+def express_analysis(raw_reads, tmp_file_path, final_file_path):
+    
+    orf1_name = raw_reads[0].split('/')[-1][:-4]
+    orf2_name = raw_reads[1].split('/')[-1][:-4]
+
+    han_orf1 = open(final_file_path + '/' + orf1_name + '_orf_filter_result' + '_virtual.fa','r+')
+    han_orf2 = open(final_file_path + '/' + orf2_name + '_orf_filter_result' + '_virtual.fa','r+')
+    han1_dic = {}
+    han2_dic = {}
+
+    for seq_record in SeqIO.parse(han_orf1, 'fasta'):
+        circ_name = seq_record.id.split('|')[0]
+        reads_count = seq_record.id.split('|')[-5]
+        han1_dic[circ_name] = reads_count
+
+    for seq_record in SeqIO.parse(han_orf2, 'fasta'):
+        circ_name = seq_record.id.split('|')[0]
+        reads_count = seq_record.id.split('|')[-5]
+        han2_dic[circ_name] = reads_count
+
+    union_set = han1_dic.keys()|han2_dic.keys()
+    circ_list = list(union_set)
+    circ_list.sort()
+    file_list = []
+    for item in circ_list:
+        file_list.append(item+'\t')
+        if item in han1_dic.keys():
+            file_list.append(han1_dic[item]+'\t')
+        else:
+            file_list.append('0'+'\t')
+        if item in han2_dic.keys():
+            file_list.append(han2_dic[item]+'\n')
+        else:
+            file_list.append('0'+'\n')    
+
+    index_file = tmp_file_path + '/two_samples_express.txt'
+    han3 = open(index_file, 'w+')
+    han3.writelines(['*\t', orf1_name+'\t', orf2_name+'\n'])
+    han3.writelines(file_list)
+    han_orf1.close()
+    han_orf2.close()
+    han3.close()
+
+
+    output_pdf = final_file_path + '/express_analysis.pdf'
+    output_csv = tmp_file_path + '/express_score.csv'
+    r_script = '''
+    library(edgeR)
+    library(ggplot2)
+    data2 <- read.csv('{}',sep='\t',row.names=1)
+    counts <- data2[,c(1,2)]
+    group <- c(1,2)
+    y <- DGEList(counts=counts,group=group)
+    keep <- rowSums(cpm(y)>1) >=1
+    y <- y[keep,,keep.lib.sizes=FALSE]
+    y <- calcNormFactors(y)
+    y_bcv <- y
+    bcv <- 0.4
+    et <- exactTest(y_bcv,dispersion = bcv^2)
+    genel <- decideTestsDGE(et,p.value=0.05,lfc=0)
+    df <- y_bcv$table
+    results <- cbind(y$counts,et$table,genel)
+    write.csv(x=results,file='{}')
+    cut_off_pvalue = 0.05
+    cut_off_logFC = 1
+    results$change = ifelse(results$PValue < cut_off_pvalue & abs(results$logFC)>= cut_off_logFC,ifelse(results$logFC>cut_off_logFC,'Up','Dpwn'),'Stable')
+    pdf('{}')
+    ggplot(results,aes(x = logFC, y = -log10(PValue), colour=change)) +
+    geom_point(alpha=0.4, size=3.5) +
+    scale_color_manual(values=c("#546de5", "#d2dae2","#ff4757")) +
+    geom_vline(xintercept=c(-1,1),lty=4,col="black",lwd=0.8) +
+    geom_hline(yintercept = -log10(cut_off_pvalue),lty=4,col="black",lwd=0.8) +
+    labs(x="log2(fold change)",y="-log10 (p-value)")+
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5),legend.position="right",legend.title = element_blank())
+    dev.off()
+    '''.format(index_file, output_csv, output_pdf)
+    
+    r_file = tmp_file_path+'/' + 'express_analysis_rscript.r'
+    han_r_file = open(r_file, 'w+')
+    han_r_file.write(r_script)
+    han_r_file.close()
+    os.system('Rscript {}'.format(r_file))
+    
+
 def main():
 
-    begin = time.perf_counter()
-    lenth_need, circrnas_file, circrna_gtf, tmp_file_name, tmp_file_path, final_name, final_file_path = file_load()
+    parse = argparse.ArgumentParser(description='Welcome to this project')
+    parse.add_argument('-y', '--yaml', required=True, help='please input the yamlfile')
+    args = parse.parse_args()
+     
+    yamlfile = args.yaml
+    con_file = open(yamlfile)
+    fileload = yaml.full_load(con_file)
 
-    time0 = time.perf_counter()
-    draw_IRES_secondary_structure(tmp_file_name, tmp_file_path, final_name, final_file_path)
-    time_add0 = time.perf_counter()-time0
-    print('draw_IRES_secondary_structure is finished! Spending time is {:.2f}s'.format(time_add0))
+    circrna_gtf = fileload['circrna_gtf']
+    lenth_need = fileload['lenth_need']
+    raw_reads = fileload['raw_reads']
+    ires_score = fileload['ires_score']
+    orf_score = fileload['orf_score']
+    tmp_file_path = fileload['tmp_file_location']
+    final_file_path = fileload['result_file_location']
 
-    time1 = time.perf_counter()
-    make_index(circrna_gtf, tmp_file_name, final_name, tmp_file_path, final_file_path)
-    time_add1 = time.perf_counter()-time1
-    print('make_index is finished! Spending time is {:.2f}s'.format(time_add1))
+    for item in raw_reads:
+          
+        genome_name = item.split('/')[-1][:-4]
+        circrnas_file = fileload['tmp_file_location']+'/'+genome_name+'_filter.fa'
+        os.system('mkdir {}/{}_IRES_graph'.format(final_file_path, genome_name))
+        os.system('mkdir {}/{}_CIRC_graph'.format(final_file_path, genome_name))
+        IRES_folder = '{}_IRES_graph'.format(genome_name)
+        CIRC_folder = '{}_CIRC_graph'.format(genome_name)
 
-    time2 = time.perf_counter()
-    make_circ_pic(lenth_need, tmp_file_name, tmp_file_path, final_name, final_file_path)
-    time_add2 = time.perf_counter()-time2
-    print('make_circ_pic is finished! Spending time is {:.2f}s'.format(time_add2))
+        # tmp file name and path
+        tmp_file_name = genome_name + '_orf'
+     
+        # final file name and path
+        final_name = genome_name + '_orf_filter_result'
 
-    time3 = time.perf_counter()
-    UpsetR(final_name, tmp_file_name, tmp_file_path, final_file_path)
-    time_add3 = time.perf_counter()-time3
-    print('UpsetR finished! Spending time is {:.2f}'.format(time_add3))
 
-    print('the whole visual_circ_orf is finished! Spending time is {:.2f}s'.format(int(time.perf_counter() - begin)))
-    print('End')
+        #begin = time.perf_counter()
+        
 
+        time0 = time.perf_counter()
+        draw_IRES_secondary_structure(IRES_folder, tmp_file_name, tmp_file_path, final_name, final_file_path)
+        time_add0 = time.perf_counter()-time0
+        print('draw_IRES_secondary_structure is finished! Spending time is {:.2f}s'.format(time_add0))
+
+        time1 = time.perf_counter()
+        make_index(circrna_gtf, tmp_file_name, final_name, tmp_file_path, final_file_path)
+        time_add1 = time.perf_counter()-time1
+        print('make_index is finished! Spending time is {:.2f}s'.format(time_add1))
+
+        time2 = time.perf_counter()
+        make_circ_pic(CIRC_folder, lenth_need, tmp_file_name, tmp_file_path, final_name, final_file_path)
+        time_add2 = time.perf_counter()-time2
+        print('make_circ_pic is finished! Spending time is {:.2f}s'.format(time_add2))
+
+        time3 = time.perf_counter()
+        UpsetR(final_name, tmp_file_name, tmp_file_path, final_file_path)
+        time_add3 = time.perf_counter()-time3
+        print('UpsetR finished! Spending time is {:.2f}'.format(time_add3))
+
+        #print('the whole visual_circ_orf is finished! Spending time is {:.2f}s'.format(int(time.perf_counter() - begin)))
+        #print('End')
+
+    if len(raw_reads) == 2:
+        time4 = time.perf_counter()
+        express_analysis(raw_reads, tmp_file_path, final_file_path)
+        time_add4 = time.perf_counter()-time4
+        print('express_analysis finished! Spending time is {:.2f}'.format(time_add4))
+    print('the whole visual_circ_orf is finished!')
 
 if __name__ == '__main__':
     main()

@@ -6,37 +6,12 @@ import argparse
 import time
 import os
 
-#download the data from the yamlfile 
-def file_load():
-
-     parse = argparse.ArgumentParser(description='Welcome to this project')
-     parse.add_argument('-y', '--yaml', required=True, help='please input the yamlfile')
-     args = parse.parse_args()
-     
-     yamlfile = args.yaml
-     con_file = open(yamlfile)
-     fileload = yaml.full_load(con_file)
-     
-     lenth_need = fileload['lenth_need']
-     genome_name = fileload['genome_name']
-     circrnas_file = fileload['result_file_location']+'/'+fileload['genome_name']+'.fa'
-     ires_score = fileload['ires_score']
-     orf_score = fileload['orf_score']
-
-     # tmp file name and path
-     tmp_file_name = fileload['genome_name'] + '_orf'
-     tmp_file_path = fileload['tmp_file_location']
-
-     # final file name and path
-     final_name = fileload['genome_name'] + '_orf_filter_result'
-     final_file_path = fileload['result_file_location']
-
-     return lenth_need, genome_name, circrnas_file, ires_score, orf_score, tmp_file_name, tmp_file_path, final_name, final_file_path
-
 # reverse_complement the '-' strand
 def seq_pretreat(genome_name, circrnas_file, tmp_file_path):
      
      han_raw_circ_file = open(circrnas_file)
+     
+     
      global true_raw_file
      true_raw_file = tmp_file_path +'/'+ genome_name + '_true.fa'
      data_circ = []
@@ -56,6 +31,7 @@ def seq_pretreat(genome_name, circrnas_file, tmp_file_path):
                                          id = seq_record.id,
                                          description = '')
                data_circ.append(rec_circ_true)
+               
 
      han_true = open(true_raw_file, 'w+')
      SeqIO.write(data_circ, han_true, 'fasta')
@@ -366,56 +342,83 @@ def translate_orf(final_name, final_file_path):
      han_amino_acid.close()
 
 def main():
-     begin = time.perf_counter()
-     lenth_need, genome_name, circrnas_file, ires_score, orf_score, tmp_file_name, tmp_file_path, final_name, final_file_path = file_load()
+     parse = argparse.ArgumentParser(description='Welcome to this project')
+     parse.add_argument('-y', '--yaml', required=True, help='please input the yamlfile')
+     args = parse.parse_args()
+     
+     yamlfile = args.yaml
+     con_file = open(yamlfile)
+     fileload = yaml.full_load(con_file)
+     
+     lenth_need = fileload['lenth_need']
+     raw_reads = fileload['raw_reads']
+     ires_score = fileload['ires_score']
+     orf_score = fileload['orf_score']
+     tmp_file_path = fileload['tmp_file_location']
+     final_file_path = fileload['result_file_location']
 
-     time0 = time.perf_counter()
-     seq_pretreat(genome_name, circrnas_file, tmp_file_path)
-     time_add0 = time.perf_counter()-time0
-     print('seq_pretreat is finished! Spending time is {:.2f}s'.format(time_add0))
+     for item in raw_reads:
+          
+          genome_name = item.split('/')[-1][:-4]
+          circrnas_file = fileload['tmp_file_location']+'/'+genome_name+'_filter.fa'
 
-     time1 = time.perf_counter()
-     get_1_orf_up(lenth_need, tmp_file_name, tmp_file_path)
-     time_add1 = time.perf_counter()-time1
-     print('\nget_1_orf_up is finished! Spending time is {:.2f}s'.format(time_add1))
+          # tmp file name and path
+          tmp_file_name = genome_name + '_orf'
+     
+          # final file name and path
+          final_name = genome_name + '_orf_filter_result'
 
-     #time2 = time.perf_counter()
-     #get_2_orf_up(lenth_need, tmp_file_name, tmp_file_path)
-     #time_add2 = time.perf_counter()-time2
-     #print('\nget_2_orf_up time is:{:.2f}'.format(time_add2))
+     
+          begin = time.perf_counter()
+          #lenth_need, genome_name, circrnas_file, ires_score, orf_score, tmp_file_name, tmp_file_path, final_name, final_file_path = file_load()
 
-     time3 = time.perf_counter()
-     IRES_score(tmp_file_name, tmp_file_path)
-     time_add3 = time.perf_counter()-time3
-     print('IRES_score is finished! Spending time is {:.2f}s'.format(time_add3))
+          time0 = time.perf_counter()
+          seq_pretreat(genome_name, circrnas_file, tmp_file_path)
+          time_add0 = time.perf_counter()-time0
+          print('seq_pretreat is finished! Spending time is {:.2f}s'.format(time_add0))
 
-     time4 = time.perf_counter()
-     filter_ires(ires_score, tmp_file_name, tmp_file_path)
-     time_add4 = time.perf_counter()-time4
-     print('filter_ires is finished! Spending time is {:.2f}s'.format(time_add4))
+          time1 = time.perf_counter()
+          get_1_orf_up(lenth_need, tmp_file_name, tmp_file_path)
+          time_add1 = time.perf_counter()-time1
+          print('\nget_1_orf_up is finished! Spending time is {:.2f}s'.format(time_add1))
 
-     time5 = time.perf_counter()
-     ORF_score(tmp_file_name, tmp_file_path)
-     time_add5 = time.perf_counter()-time5
-     print('ORF_score is finished! Spending time is {:.2f}s'.format(time_add5))
+          #time2 = time.perf_counter()
+          #get_2_orf_up(lenth_need, tmp_file_name, tmp_file_path)
+          #time_add2 = time.perf_counter()-time2
+          #print('\nget_2_orf_up time is:{:.2f}'.format(time_add2))
 
-     time6 = time.perf_counter()
-     filter_orf(orf_score, final_name, final_file_path)
-     time_add6 = time.perf_counter()-time6
-     print('filter_orf is finished! Spending time is {:.2f}s'.format(time_add6))
+          time3 = time.perf_counter()
+          IRES_score(tmp_file_name, tmp_file_path)
+          time_add3 = time.perf_counter()-time3
+          print('IRES_score is finished! Spending time is {:.2f}s'.format(time_add3))
 
-     time7 = time.perf_counter()
-     reverse_complment(final_name, final_file_path)
-     time_add7 = time.perf_counter()-time7
-     print('reverse_complment is finished! Spending time is {:.2f}s'.format(time_add7))
+          time4 = time.perf_counter()
+          filter_ires(ires_score, tmp_file_name, tmp_file_path)
+          time_add4 = time.perf_counter()-time4
+          print('filter_ires is finished! Spending time is {:.2f}s'.format(time_add4))
 
-     time8 = time.perf_counter()
-     translate_orf(final_name, final_file_path)
-     time_add8 = time.perf_counter()-time8
-     print('translate_orf is finished! Spending time is {:.2f}s'.format(time_add8))
+          time5 = time.perf_counter()
+          ORF_score(tmp_file_name, tmp_file_path)
+          time_add5 = time.perf_counter()-time5
+          print('ORF_score is finished! Spending time is {:.2f}s'.format(time_add5))
 
-     print('the whole filter_coding_orf is finished! Spending time is {:.2f}s'.format(int(time.perf_counter() - begin)))
-     print('End')
+          time6 = time.perf_counter()
+          filter_orf(orf_score, final_name, final_file_path)
+          time_add6 = time.perf_counter()-time6
+          print('filter_orf is finished! Spending time is {:.2f}s'.format(time_add6))
+
+          time7 = time.perf_counter()
+          reverse_complment(final_name, final_file_path)
+          time_add7 = time.perf_counter()-time7
+          print('reverse_complment is finished! Spending time is {:.2f}s'.format(time_add7))
+
+          time8 = time.perf_counter()
+          translate_orf(final_name, final_file_path)
+          time_add8 = time.perf_counter()-time8
+          print('translate_orf is finished! Spending time is {:.2f}s'.format(time_add8))
+
+          print('the whole filter_coding_orf is finished! Spending time is {:.2f}s'.format(int(time.perf_counter() - begin)))
+          print('End')
 
 if __name__ == '__main__':
      main()
