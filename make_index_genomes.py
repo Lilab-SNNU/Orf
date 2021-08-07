@@ -188,7 +188,7 @@ class Genome(object):
 
 
 def main():
-    parse = argparse.ArgumentParser(description='This script helps to clean reads and map to genome')
+    parse = argparse.ArgumentParser(description='This script helps to make index genome')
     parse.add_argument('-y', dest="yaml", required=True)
     parse.add_argument('-map-only', dest='map_only', required=False)
     args = parse.parse_args()
