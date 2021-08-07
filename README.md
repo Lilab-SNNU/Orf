@@ -30,6 +30,8 @@ CircOrf is a Python3-base pipeline for the prediction and visualization of circR
 ## R package:
 
 - UpsetR
+- edgeR
+- ggplot2
 
 # Quick Start
 Usually you can download the package from github simply,and then:
@@ -79,7 +81,7 @@ Attention: Before you begin to use this package, you need to make sure that you 
   python filter_coding_orf.py -y config.yaml
   ```
   
-  - Visualize the IRES region secondary structure, the circ annoated graph and the distribution of the predicted ORFs
+  - Visualize the IRES region secondary structure, the circ annoated graph, the express_analysis of the circ and the distribution of the predicted ORFs
   
   ```
   python visual_circ_orf.py -y config.yaml
@@ -95,7 +97,7 @@ When opening the config file in text format, there are some lines that need to b
    
  - genome_gtf: Fill in the absolute path of the species genome annoated file related to circRNA(not the relative path!).
    
- - raw_reads: Fill in the absolute path of the Ribo-Seq data related to your interest species(not the relative path!).
+ - raw_reads: Fill in the absolute path of the Ribo-Seq data(One or two tissue samples data in the same species) related to your interest species(not the relative path!).
    
  - ribosome_fasta: Fill in the absolute path of the rRNA data related to your interset species(not the relative path!).
  
