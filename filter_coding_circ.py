@@ -42,18 +42,35 @@ def classify(tmp_file_location,
             if int(start) < int(i) < int(end):
                 translated_circ_id_list.append(id_dic[i])
                 break
+
+    fastqid = rcrj.split('A')[0]
+    han_reads_file = open(tmp_file_location + '/' + fastqid + 'Aligned.sortedByCoord.out.bam.merge_result.RCRJ_result.csv.junction_filter_result')
+    reads_list = []
+    for line in han_reads_file:
+        line = line.replace('\n','')
+        line = line.replace('\t','$')
+        reads_list.append(line.split('$')[3])
+    
+            
     total_circ = SeqIO.parse(circrnas, 'fasta')
     final_trans_circ_seq = []
+    j = 0
     for i in total_circ:
         if i.id in translated_circ_id_list:
-            final_trans_circ_seq.append(i)
+            rec = SeqRecord(i.seq,
+                            id = i.id + '|' + reads_list[j],
+                            description='')
+            final_trans_circ_seq.append(rec)
+            j += 1
             print(i)
     fastqid = rcrj.split('A')[0]
     
-    final_trans_circ_seq_name = result_file_location+'/'+name+'.fa'
+    final_trans_circ_seq_name = tmp_file_location+'/'+fastqid+'_filter.fa'
     subprocess.call('mkdir -p {}'.format(result_file_location),shell=True)
     SeqIO.write(final_trans_circ_seq, final_trans_circ_seq_name, 'fasta')
 
+
+    
 def main():
     parse = argparse.ArgumentParser(description='This script helps to clean reads and map to genome')
     parse.add_argument('-y', dest="yaml", required=True)
