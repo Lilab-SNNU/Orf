@@ -72,7 +72,7 @@ def classify(tmp_file_location,
 
     
 def main():
-    parse = argparse.ArgumentParser(description='This script helps to clean reads and map to genome')
+    parse = argparse.ArgumentParser(description='This script helps to filter coding circ')
     parse.add_argument('-y', dest="yaml", required=True)
     parse.add_argument('-map-only', dest='map_only', required=False)
     args = parse.parse_args()
