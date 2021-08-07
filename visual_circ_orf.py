@@ -363,7 +363,7 @@ def express_analysis(raw_reads, tmp_file_path, final_file_path):
 
 def main():
 
-    parse = argparse.ArgumentParser(description='Welcome to this project')
+    parse = argparse.ArgumentParser(description='This script helps to visualize the circ')
     parse.add_argument('-y', '--yaml', required=True, help='please input the yamlfile')
     args = parse.parse_args()
      
