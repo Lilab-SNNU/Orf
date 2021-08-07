@@ -342,7 +342,7 @@ def translate_orf(final_name, final_file_path):
      han_amino_acid.close()
 
 def main():
-     parse = argparse.ArgumentParser(description='Welcome to this project')
+     parse = argparse.ArgumentParser(description='This script helps to filter coding orf')
      parse.add_argument('-y', '--yaml', required=True, help='please input the yamlfile')
      args = parse.parse_args()
      
