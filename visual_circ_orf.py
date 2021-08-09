@@ -338,6 +338,7 @@ def express_analysis(raw_reads, tmp_file_path, final_file_path):
     genel <- decideTestsDGE(et,p.value=0.05,lfc=0)
     df <- y_bcv$table
     results <- cbind(y$counts,et$table,genel)
+    summary(genel)
     write.csv(x=results,file='{}')
     cut_off_pvalue = 0.05
     cut_off_logFC = 1
