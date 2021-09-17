@@ -247,13 +247,14 @@ def make_circ_pic(CIRC_folder, lenth_need, tmp_file_name, tmp_file_path, final_n
         DRAW.text((3900, 500), 'IRES score : {}'.format(ires_score), fill='black', font = arial100)
         DRAW.rectangle((3600, 700, 3800, 800), fill='orange')
         DRAW.text((3900, 700), 'ORF score : {}'.format(orf_score), fill='black', font = arial100)
-        DRAW.text((3900, 900), 'ORF start site : {}'.format(orf_start_site), fill='black', font = arial100)
-        DRAW.text((3900, 1100), 'ORF stop site : {}'.format(orf_stop_site), fill='black', font = arial100)
+        
 
-        DRAW.text((1900,2200), 'circRNA_lenth = {}'.format(circ_lenth), fill='black', font = arial100)
-        DRAW.text((1900,2400), 'ORF_lenth = {}'.format(orf_lenth), fill='black', font = arial100)
-        DRAW.text((1900,2600), 'transcript_id = {}'.format(transcript_id), fill='black', font = arial100)
-
+        DRAW.text((1900,2000), 'circRNA_lenth = {}'.format(circ_lenth), fill='black', font = arial100)
+        DRAW.text((1900,2200), 'ORF_lenth = {}'.format(orf_lenth), fill='black', font = arial100)
+        DRAW.text((1900,2400), 'transcript_id = {}'.format(transcript_id), fill='black', font = arial100)
+        DRAW.text((1900,2600), 'ORF start site : {}'.format(orf_start_site), fill='black', font = arial100)
+        DRAW.text((1900,2800), 'ORF stop site : {}'.format(orf_stop_site), fill='black', font = arial100)
+        
         arial150 = ImageFont.truetype('LiberationSans-Regular.ttf', 150)
         DRAW.text((2280,1800), "3'", fill='black', font = arial150)
         DRAW.text((2600,1800), "5'", fill='black', font = arial150)
