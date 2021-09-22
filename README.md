@@ -38,6 +38,7 @@ Usually you can download the package from github simply,and then:
 ```
 git clone git://github.com/Lilab-SNNU/CircOrf.git
 cd CircOrf
+tar -zxvf requiredSoft.tar.gz
 cd requiredSoft
 chmod 777 STAR
 ```
