@@ -49,7 +49,7 @@ tmp_file_location: /full/absolute/path
 ################################
 
 # Coverage counts, DEFAULT = 10.
-coverage_counts: 2
+coverage_counts: 10
 
 # The thread to run tophat2 and SEPCtr, DEFAULT = 6
 thread: 12
