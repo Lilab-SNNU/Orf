@@ -104,7 +104,7 @@ When opening the config file in text format, there are some lines that need to b
    
  - ribosome_fasta: Fill in the absolute path of the rRNA data related to your interset species(not the relative path!).
  
- - circrnas: Fill in the absolute path of the candidate circRNA(not the relative path!).
+ - circrnas: Fill in the absolute path of the candidate circRNA(not the relative path!).You need to ensure that the id format of your circRNA is similar to '>hsa_circ_0000003|chr1:1423242-1459777+|NM_031921|ATAD3B'.
  
  - circrna_gtf: Fill in the absolute path of the candidate circRNA annoated file(not the relative path!).
  
