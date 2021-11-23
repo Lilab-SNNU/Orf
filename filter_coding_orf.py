@@ -37,7 +37,6 @@ def seq_pretreat(circrna_gtf, genome_name, circrnas_file, tmp_file_path):
                                          description = '')
                data_circ.append(rec_circ_true)
                
-
      han_true = open(true_raw_file, 'w+')
      SeqIO.write(data_circ, han_true, 'fasta')
      han_true.close()
@@ -277,8 +276,6 @@ def filter_ires_M6A(lenth_need, ires_score, m6a_score, tmp_file_name, tmp_file_p
                          j += 1
                if j == 0:
                     need_list.append(key)
-
-          
           
           for i in need_list:
                whole_filter_orf_id_list.append(orf_info_dic[i][1])
@@ -358,7 +355,6 @@ def reverse_complment(circrna_gtf, final_name, final_file_path):
           line = line.replace('\n', '')
           line_list = line.split('\t')
           dic_strand[line_list[0]] = line_list[1]
-
 
      for seq_record in SeqIO.parse(han_true, 'fasta'):
           circ_name = seq_record.id.split('$')[0]
