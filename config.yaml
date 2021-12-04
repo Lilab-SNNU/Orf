@@ -1,0 +1,64 @@
+# CircOrf-config-file
+# This configuration file includes all adjustable options and files for CircOrf.
+# Please input full absolute path.
+# You can submit your question by submitting issue on github or sending an e-mail
+# E-mail = mr1997@snnu.edu.cn
+# Date = 30 July 2021
+
+#################
+# required data #
+#################
+
+# The path of genome file
+transcript_fasta: /full/absolute/path
+
+# The path of ribo-seq raw reads file(single)
+raw_reads: 
+           - /full/absolute/path
+
+# The path of ribosome sequence file
+ribosome_fasta: /full/absolute/path
+
+# The path of Candidate circRNA
+circrnas: /full/absolute/path
+#/home/li/public/mr/data/Human-example/human_hg19_circRNAs_putative_spliced_sequence.fa
+
+# The path of gtf file of circRNA, the file should be generated in our way(README.md) 
+circrna_gtf: /full/absolute/path
+
+#####################
+# Required location #
+#####################
+
+# The path of folder for storing the final result
+result_file_location: /full/absolute/path
+
+# The path of folder for storing temporary results
+tmp_file_location: /full/absolute/path
+
+################################
+# Adjustable filter parameters #
+################################
+
+# The thread to run tophat2 and SEPCtr, DEFAULT = 6
+thread: 12
+
+#################
+# OTHER OPTIONS #
+#################
+
+# The path of trimmomatic.jar
+trimmomatic_jar: ./requiredSoft/trimmomatic-0.38.jar
+
+# The path of your train_pos.fa for M6A, DEFAULT = default_path
+pos_fa: default_path
+
+# The path of your train_neg.fa for M6A, DEFAULT = default_path
+neg_fa: default_path
+
+# type of Ribo-seq data, value: sra or fastq
+ribotype: sra
+
+
+
+
