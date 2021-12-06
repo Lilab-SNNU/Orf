@@ -21,7 +21,6 @@ ribosome_fasta: /full/absolute/path
 
 # The path of Candidate circRNA
 circrnas: /full/absolute/path
-#/home/li/public/mr/data/Human-example/human_hg19_circRNAs_putative_spliced_sequence.fa
 
 # The path of gtf file of circRNA, the file should be generated in our way(README.md) 
 circrna_gtf: /full/absolute/path
