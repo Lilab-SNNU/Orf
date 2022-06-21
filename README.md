@@ -1,6 +1,6 @@
-# CircOrf
+# CircCode 2
 
-CircOrf is a Python3-base pipeline for the prediction and visualization of circRNA and ORF.
+CircCode 2 is a Python3-base pipeline for the prediction and visualization of coding ORF in circRNAs.
 
 # Requirement
 ## Data:
